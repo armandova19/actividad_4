@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Chat con nodeJS y Socket.io </title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+	<style>
+	#chatbox {
+		text-align:left;
+		margin:0 auto;
+		margin-bottom:25px;
+		padding:10px;
+		background:#fff;
+		height:270px;
+		width:430px;
+		border:1px solid #ACD8F0;
+		overflow:auto; }
+
+		body{
+			background: lightblue;
+		}
+		#loginform{
+			text-align: center;
+			margin-top: 5%;
+		}
+		#wrapper{
+			background: lightseagreen;
+			border-radius: 2%;
+			text-align: center;
+			padding: 10%;
+		}
+		.message{
+			
+			text-align: center;
+			text-decoration: double;	
+			 
+		}
+		#exit{
+			text-align: right;
+			float: right;
+		}
+		#menu{
+			background-color: lightgray;
+			text-align: center;
+		}
+	</style>
+		
+
+
+</head>
+
+<body>
+	<!--<div id="loginform">
+		<p> Ingresa tu nombre para continuar:</p>
+		<label for="name">Nombre:</label>
+		<input type="text" name="nombre" id="nombre"/>
+		<input type="button" name="enviar" id="enviar-nombre" value="Entrar"/>
+	</div>
+-->
+	<div id="wrapper">
+		<div id="menu">
+			<p class="bienvenido"> Bienvenido, <b id="usernameTag"></b>
+			<p class="logout"><a id="exit" href="/login.html">Salir del chat</a></p>
+		</div>
+
+		<div id="chatbox">
+		<!-- Caja del chat que contendrá todos los mensajes. -->
+		</div>
+
+		<form name="message" action="" class="message">
+			<input name="usermsg" type="text" id="mensaje" size="63"/>
+			<input type="button" name="submitmsg" id="enviarMensaje" value="Enviar Mensaje"/>
+		</form>
+
+	</div>
+
+	<script src="/socket.io/socket.io.js"></script>
+	<script>
+
+		var socket = io(); //Instancia del socket.io agregado previamente.
+
+		$(document).ready(function(){
+			$('#wrapper').hide();
+
+			$('#enviar-nombre').click(function(){
+				if($('#nombre').val().length <= 0){
+					alert('Ingresa tu nombre de usuario');
+				}else{
+					var username = $('#nombre').val();
+					socket.emit('crearUser', username); // Al ingresar el nombre se envia a la función crearUser
+					$('#wrapper').show();
+					$('#loginform').hide();
+					$('#usernameTag').append(username);
+				}
+			});
+
+			$('#enviarMensaje').click(function(){
+				if($("#mensaje").val().length <=0){
+					alert("escribe un mensaje para poder enviar");
+				}else{
+					var mensaje = $('#mensaje').val()
+					socket.emit('mjsNuevo', mensaje);
+				}
+
+			});
+
+			socket.on('mensaje', function(data){ // Función que tiene de resouesta el nuevo mensaje, concatenamos e insertamos en la caja de chat.
+			var nuevoMensaje = '<b>' + data.usuario + ' dice:</b> ' + data.mensaje;
+			$('#chatbox').append(nuevoMensaje + '</br>');
+			$('#mensaje').val("");
+			});
+
+
+		});
+	</script>
+</body>
+
+</html>
